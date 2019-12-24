@@ -1,5 +1,27 @@
 import {readFileSync} from 'fs';
 
+class CardDeck {
+  t: number;
+  tPrime: number;
+
+  constructor(length: number, index: number) {
+    this.t = index;
+    this.tPrime = length - 1 - index;
+  }
+
+  deal() {
+    const temp = this.t;
+    this.t = this.tPrime;
+    this.tPrime = temp;
+  }
+
+  cut() {
+
+  }
+
+}
+
+
 
 function deal(cards: number[]) {
   return cards.reverse();
