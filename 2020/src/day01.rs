@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::fs;
 
+use std::cmp::Ordering;
+
 pub fn input_generator() -> Vec<i32> {
     let raw_input = fs::read_to_string("input/day01.txt").unwrap();
 
@@ -35,12 +37,10 @@ pub fn part_two() -> Option<i32> {
         while left != i && right != i {
             let curr = expenses[left] + expenses[i] + expenses[right];
 
-            if curr == target {
-                return Some(expenses[left] * expenses[i] * expenses[right]);
-            } else if curr > target {
-                right -= 1;
-            } else if curr < target {
-                left += 1;
+            match curr.cmp(&target) {
+                Ordering::Equal => return Some(expenses[left] * expenses[i] * expenses[right]),
+                Ordering::Greater => right -= 1,
+                Ordering::Less => left += 1,
             }
         }
     }
