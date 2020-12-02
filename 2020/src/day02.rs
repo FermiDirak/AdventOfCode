@@ -4,8 +4,8 @@ use std::fs;
 #[derive(Debug)]
 struct Validator {
     letter: char,
-    min_count: i32,
-    max_count: i32,
+    num1: usize,
+    num2: usize,
 }
 
 #[derive(Debug)]
@@ -24,8 +24,8 @@ fn input_generator() -> Vec<Line> {
 
             let captures = regex.captures_iter(line).next().unwrap();
 
-            let min_count = captures.get(1).unwrap().as_str();
-            let max_count = captures.get(2).unwrap().as_str();
+            let num1 = captures.get(1).unwrap().as_str();
+            let num2 = captures.get(2).unwrap().as_str();
             let letter = captures.get(3).unwrap().as_str();
             let password = captures.get(4).unwrap().as_str();
 
@@ -33,8 +33,8 @@ fn input_generator() -> Vec<Line> {
                 password: String::from(password),
                 validator: Validator {
                     letter: letter.chars().next().unwrap(),
-                    min_count: min_count.parse::<i32>().unwrap(),
-                    max_count: max_count.parse::<i32>().unwrap(),
+                    num1: num1.parse::<usize>().unwrap(),
+                    num2: num2.parse::<usize>().unwrap(),
                 },
             }
         })
@@ -55,7 +55,7 @@ pub fn part_one() -> Option<i32> {
             }
         }
 
-        if letter_count >= line.validator.min_count && letter_count <= line.validator.max_count {
+        if letter_count >= line.validator.num1 && letter_count <= line.validator.num2 {
             valid_count += 1;
         }
     }
@@ -63,5 +63,29 @@ pub fn part_one() -> Option<i32> {
 }
 
 pub fn part_two() -> Option<i32> {
-    Some(-1)
+    let lines = input_generator();
+
+    let mut valid_count = 0;
+
+    for line in &lines {
+        let mut matches = 0;
+        let password_letters: Vec<char> = line.password.chars().collect();
+
+        let match1 = password_letters.get(line.validator.num1 - 1);
+        let match2 = password_letters.get(line.validator.num2 - 1);
+
+        if Some(&line.validator.letter) == match1 {
+            matches += 1;
+        }
+
+        if Some(&line.validator.letter) == match2 {
+            matches += 1;
+        }
+
+        if matches == 1 {
+            valid_count += 1;
+        }
+    }
+
+    Some(valid_count)
 }
