@@ -3,29 +3,29 @@ use std::fs;
 
 use std::cmp::Ordering;
 
-pub fn input_generator() -> Vec<i32> {
+pub fn input_generator() -> Vec<isize> {
     let raw_input = fs::read_to_string("input/day01.txt").unwrap();
 
     raw_input
         .lines()
-        .map(|line| line.parse::<i32>().unwrap())
-        .collect::<Vec<i32>>()
+        .map(|line| line.parse::<isize>().unwrap())
+        .collect::<Vec<isize>>()
 }
 
-pub fn part_one() -> Option<i32> {
+pub fn part_one() -> isize {
     let expenses = input_generator();
-    let expenses = expenses.into_iter().collect::<HashSet<i32>>();
+    let expenses = expenses.into_iter().collect::<HashSet<isize>>();
 
     for expense in &expenses {
         if expenses.contains(&(2020 - expense)) {
-            return Some(expense * (2020 - expense));
+            return expense * (2020 - expense);
         }
     }
 
-    return None;
+    panic!();
 }
 
-pub fn part_two() -> Option<i32> {
+pub fn part_two() -> isize {
     let target = 2020;
     let mut expenses = input_generator();
     expenses.sort();
@@ -38,12 +38,12 @@ pub fn part_two() -> Option<i32> {
             let curr = expenses[left] + expenses[i] + expenses[right];
 
             match curr.cmp(&target) {
-                Ordering::Equal => return Some(expenses[left] * expenses[i] * expenses[right]),
+                Ordering::Equal => return expenses[left] * expenses[i] * expenses[right],
                 Ordering::Greater => right -= 1,
                 Ordering::Less => left += 1,
             }
         }
     }
 
-    return None;
+    panic!();
 }

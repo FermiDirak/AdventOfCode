@@ -41,7 +41,7 @@ fn input_generator() -> Vec<Line> {
         .collect::<Vec<Line>>()
 }
 
-pub fn part_one() -> Option<i32> {
+pub fn part_one() -> isize {
     let lines = input_generator();
 
     let mut valid_count = 0;
@@ -59,10 +59,10 @@ pub fn part_one() -> Option<i32> {
             valid_count += 1;
         }
     }
-    Some(valid_count)
+    valid_count
 }
 
-pub fn part_two() -> Option<i32> {
+pub fn part_two() -> isize {
     let lines = input_generator();
 
     let mut valid_count = 0;
@@ -87,5 +87,5 @@ pub fn part_two() -> Option<i32> {
         }
     }
 
-    Some(valid_count)
+    valid_count
 }
