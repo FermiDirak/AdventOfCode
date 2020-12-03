@@ -1,5 +1,9 @@
 use std::fmt;
 use std::fs;
+use std::ops;
+
+#[derive(Debug, PartialEq)]
+struct Coord(isize, isize);
 
 #[derive(Debug)]
 enum Tile {
@@ -96,5 +100,27 @@ pub fn part_one() -> isize {
 }
 
 pub fn part_two() -> isize {
-    0
+    let forest = input_generator();
+    let slopes = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
+    let mut trees_hit_by_slope: Vec<isize> = Vec::new();
+
+    for slope in slopes.iter() {
+        let mut trees_hit = 0;
+        let mut pos = (0, 0);
+
+        while pos.1 < forest.height {
+            let tile_hit = forest.get(pos.0, pos.1).unwrap();
+
+            if let Tile::Tree = tile_hit {
+                trees_hit += 1;
+            }
+
+            pos.0 += slope.0;
+            pos.1 += slope.1;
+        }
+
+        trees_hit_by_slope.push(trees_hit);
+    }
+
+    trees_hit_by_slope.iter().fold(1, |acc, curr| acc * curr)
 }
