@@ -20,7 +20,7 @@ fn input_generator() -> Vec<Line> {
     raw_input
         .lines()
         .map(|line| {
-            let regex = Regex::new("^(.*?)-(.*?)\\s(.*?): (.*?)$").unwrap();
+            let regex = Regex::new("^(.*?)-(.*?)\\s(.*?):\\s(.*?)$").unwrap();
 
             let captures = regex.captures_iter(line).next().unwrap();
 
