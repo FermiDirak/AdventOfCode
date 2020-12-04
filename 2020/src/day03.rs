@@ -1,6 +1,5 @@
 use std::fmt;
 use std::fs;
-use std::ops;
 
 #[derive(Debug, PartialEq)]
 struct Coord(isize, isize);
@@ -23,9 +22,6 @@ impl Forest {
         let x = x % self.width;
         self.data.get(x + (y * self.width))
     }
-
-    /// prints the tree
-    pub fn print(self: &Self) {}
 }
 
 impl fmt::Debug for Forest {
