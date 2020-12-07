@@ -10,42 +10,37 @@ fn input_generator() -> BagGraph {
     let mut connections = HashMap::new();
 
     raw_input.lines().for_each(|line| {
-        let leaf_regex = Regex::new("^(.*?) bags contain no other bags.$").unwrap();
-        if leaf_regex.is_match(&line) {
-            let captures = leaf_regex.captures(&line).unwrap();
-            let bag = captures.get(1).unwrap().as_str();
+        let regex = Regex::new("^(.*?) bags contain (.*?)\\.$").unwrap();
+        if !regex.is_match(line) {
+            panic!();
+        }
 
-            connections.insert(bag.to_string(), Vec::new());
+        let captures = regex.captures(&line).unwrap();
+        let bag = captures.get(1).unwrap().as_str().to_owned();
+        let connected_to = captures.get(2).unwrap().as_str();
+
+        if connected_to == "no other bags" {
+            connections.insert(bag.to_owned(), Vec::new());
             return;
         }
 
-        let node_regex = Regex::new("^(.*?) bags contain (.*?)$").unwrap();
-        if node_regex.is_match(&line) {
-            let captures = node_regex.captures(&line).unwrap();
-            let first = captures.get(1).unwrap().as_str().to_string();
-            let second = captures.get(2).unwrap().as_str();
+        let connected_to_regex = Regex::new("(.*?) bags?(?:, |)").unwrap();
+        let connected_to: Vec<(String, usize)> = connected_to_regex
+            .captures_iter(connected_to)
+            .map(|captures| {
+                let connection = captures.get(1).unwrap().as_str();
 
-            let mut sub_bags = Vec::new();
+                let connection_regex = Regex::new("(.*?) (.*?)$").unwrap();
+                let captures = connection_regex.captures(connection).unwrap();
 
-            let second_regex = Regex::new("(.*?) bags?(?:\\.|, )").unwrap();
+                (
+                    captures.get(2).unwrap().as_str().to_string(),
+                    captures.get(1).unwrap().as_str().parse::<usize>().unwrap(),
+                )
+            })
+            .collect();
 
-            for captures in second_regex.captures_iter(&second) {
-                let sub_bag_info = captures.get(1).unwrap().as_str();
-
-                let bag_info_regex = Regex::new("^(.*?) (.*?)$").unwrap();
-                let captures = bag_info_regex.captures(&sub_bag_info).unwrap();
-                let count = captures.get(1).unwrap().as_str().parse::<usize>().unwrap();
-                let name = captures.get(2).unwrap().as_str().to_string();
-
-                let connection = (name, count);
-                sub_bags.push(connection);
-            }
-
-            connections.insert(first, sub_bags);
-            return;
-        }
-
-        panic!();
+        connections.insert(bag.to_owned(), connected_to);
     });
 
     connections
