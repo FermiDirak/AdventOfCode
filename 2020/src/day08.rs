@@ -40,11 +40,6 @@ fn input_generator() -> Vec<Instruction> {
 }
 
 #[derive(Debug)]
-enum ResCode {
-    SuccessfullyTerminated,
-}
-
-#[derive(Debug)]
 struct Program {
     instructions: Vec<Instruction>,
     next_line: usize,
