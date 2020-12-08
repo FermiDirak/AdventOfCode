@@ -5,6 +5,7 @@ mod day04;
 mod day05;
 mod day06;
 mod day07;
+mod day08;
 
 fn main() {
     // println!("Day01 p1: {:?}", day01::part_one());
@@ -25,6 +26,9 @@ fn main() {
     // println!("Day06 p1: {:?}", day06::part_one());
     // println!("Day06 p2: {:?}", day06::part_two());
 
-    println!("Day07 p1: {:?}", day07::part_one());
-    println!("Day07 p2: {:?}", day07::part_two());
+    // println!("Day07 p1: {:?}", day07::part_one());
+    // println!("Day07 p2: {:?}", day07::part_two());
+
+    println!("Day08 p1: {:?}", day08::part_one());
+    println!("Day08 p2: {:?}", day08::part_two());
 }
