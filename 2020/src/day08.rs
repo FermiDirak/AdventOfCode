@@ -9,36 +9,6 @@ enum OpCode {
     NOP,
 }
 
-#[derive(Debug, Clone)]
-struct Instruction {
-    pub op_code: OpCode,
-    pub argument: isize,
-}
-
-fn input_generator() -> Vec<Instruction> {
-    let raw_input = fs::read_to_string("input/day08.txt").unwrap();
-    let instruction_regex = Regex::new("^(.*?) (.*?)$").unwrap();
-
-    raw_input
-        .lines()
-        .map(|line| {
-            let captures = instruction_regex.captures(line).unwrap();
-            let op_code = captures.get(1).unwrap().as_str();
-            let op_code = match op_code {
-                "acc" => OpCode::ACC,
-                "jmp" => OpCode::JMP,
-                "nop" => OpCode::NOP,
-                _ => panic!(),
-            };
-
-            let argument = captures.get(2).unwrap().as_str();
-            let argument = argument.parse::<isize>().unwrap();
-
-            Instruction { op_code, argument }
-        })
-        .collect()
-}
-
 #[derive(Debug)]
 struct Program {
     instructions: Vec<Instruction>,
@@ -68,6 +38,36 @@ impl Program {
             OpCode::NOP => self.next_line += 1,
         }
     }
+}
+
+#[derive(Debug, Clone)]
+struct Instruction {
+    pub op_code: OpCode,
+    pub argument: isize,
+}
+
+fn input_generator() -> Vec<Instruction> {
+    let raw_input = fs::read_to_string("input/day08.txt").unwrap();
+    let instruction_regex = Regex::new("^(.*?) (.*?)$").unwrap();
+
+    raw_input
+        .lines()
+        .map(|line| {
+            let captures = instruction_regex.captures(line).unwrap();
+            let op_code = captures.get(1).unwrap().as_str();
+            let op_code = match op_code {
+                "acc" => OpCode::ACC,
+                "jmp" => OpCode::JMP,
+                "nop" => OpCode::NOP,
+                _ => panic!(),
+            };
+
+            let argument = captures.get(2).unwrap().as_str();
+            let argument = argument.parse::<isize>().unwrap();
+
+            Instruction { op_code, argument }
+        })
+        .collect()
 }
 
 pub fn part_one() -> isize {
