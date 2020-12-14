@@ -142,8 +142,6 @@ pub fn part_two() -> isize {
                 pos = (pos.0 + offset.0, pos.1 + offset.1);
             }
         }
-
-        println!("{:?}", pos);
     }
 
     pos.0.abs() + pos.1.abs()
