@@ -2,92 +2,87 @@ use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::fs;
 
+type FieldRules = HashMap<String, Vec<(usize, usize)>>;
+type Ticket = Vec<usize>;
+
 #[derive(Debug)]
 struct Input {
-    fields: HashMap<String, Vec<(usize, usize)>>,
-    ticket: Vec<usize>,
-    nearby_tickets: Vec<Vec<usize>>,
+    field_rules: FieldRules,
+    my_ticket: Ticket,
+    nearby_tickets: Vec<Ticket>,
 }
 
 fn input_generator() -> Input {
     let raw_input = fs::read_to_string("input/day16.txt").unwrap();
     let mut sections = raw_input.split("\n\n");
+    let field_rules_section = sections.next().unwrap();
+    let my_ticket_section = sections.next().unwrap();
+    let nearby_tickets_section = sections.next().unwrap();
 
-    let mut fields = HashMap::new();
-    let ranges_section = sections.next().unwrap();
-    ranges_section.lines().for_each(|line| {
-        let field_name_regex = Regex::new("^(.*?):").unwrap();
-        let caps = field_name_regex.captures(line).unwrap();
-        let field_name = caps.get(1).unwrap().as_str().to_owned();
+    let field_rules = field_rules_section
+        .lines()
+        .map(|line| {
+            let field_name_regex = Regex::new("^(.*?):").unwrap();
+            let caps = field_name_regex.captures(line).unwrap();
+            let field_name = caps[1].to_owned();
 
-        let mut range = Vec::new();
+            let mut range = Vec::new();
 
-        let range_regex = Regex::new("(\\d*)-(\\d*)").unwrap();
-        for caps in range_regex.captures_iter(line) {
-            let start = caps.get(1).unwrap().as_str().parse::<usize>().unwrap();
-            let end = caps.get(2).unwrap().as_str().parse::<usize>().unwrap();
-            range.push((start, end));
-        }
+            let range_regex = Regex::new("(\\d*)-(\\d*)").unwrap();
+            for caps in range_regex.captures_iter(line) {
+                let start = caps[1].parse().unwrap();
+                let end = caps[2].parse().unwrap();
+                range.push((start, end));
+            }
 
-        fields.insert(field_name, range);
-    });
-
-    let ticket = sections
-        .next()
-        .unwrap()
-        .split(",")
-        .map(|text| text.parse::<usize>().unwrap())
+            (field_name, range)
+        })
         .collect();
 
-    let nearby_tickets = sections
-        .next()
-        .unwrap()
+    let my_ticket = my_ticket_section
+        .split(",")
+        .map(str::parse)
+        .map(Result::unwrap)
+        .collect();
+
+    let nearby_tickets = nearby_tickets_section
         .lines()
         .map(|line| {
             line.split(",")
-                .map(|text| text.parse::<usize>().unwrap())
+                .map(str::parse)
+                .map(Result::unwrap)
                 .collect()
         })
         .collect();
 
     Input {
-        fields,
-        ticket,
+        field_rules,
+        my_ticket,
         nearby_tickets,
     }
 }
 
 pub fn part_one() -> usize {
     let input = input_generator();
-    let values: Vec<usize> = input
-        .nearby_tickets
+    let ticket_values: Vec<usize> = input.nearby_tickets.iter().flat_map(Vec::clone).collect();
+    let ranges: Vec<(usize, usize)> = input.field_rules.values().flat_map(Vec::clone).collect();
+
+    ticket_values
         .iter()
-        .flat_map(|nums| nums.clone())
-        .collect();
-
-    let mut invalid_vals = Vec::new();
-
-    for &val in &values {
-        let is_valid = input
-            .fields
-            .values()
-            .flat_map(|ranges| ranges.clone())
-            .any(|(start, end)| val >= start && val <= end);
-
-        if !is_valid {
-            invalid_vals.push(val);
-        }
-    }
-
-    invalid_vals.iter().sum()
+        .filter(|&ticket_value| {
+            ranges
+                .iter()
+                .any(|(start, end)| ticket_value >= start && ticket_value <= end)
+        })
+        .sum()
 }
 
 pub fn part_two() -> usize {
     fn is_ticket_valid(ranges: &Vec<(usize, usize)>, ticket: &Vec<usize>) -> bool {
-        ticket.iter().all(|&val| {
+        ticket.iter().all(|&ticket_value| {
             ranges
                 .iter()
-                .any(|&(start, end)| val >= start && val <= end)
+                .any(|&(start, end)| ticket_value >= start && ticket_value <= end)
         })
     }
 
@@ -107,7 +102,7 @@ pub fn part_two() -> usize {
     }
 
     let input = input_generator();
-    let ranges = input.fields.values().cloned().flat_map(|vec| vec).collect();
+    let ranges = input.field_rules.values().flat_map(Vec::clone).collect();
     let valid_nearby_tickets: Vec<Vec<usize>> = input
         .nearby_tickets
         .iter()
@@ -115,54 +110,43 @@ pub fn part_two() -> usize {
         .filter(|ticket| is_ticket_valid(&ranges, ticket))
         .collect();
 
-    let columns = transpose(&valid_nearby_tickets);
+    let field_columns = transpose(&valid_nearby_tickets);
 
-    let mut field_indicies: HashMap<String, Vec<usize>> = HashMap::new();
-
-    for (field_name, ranges) in input.fields.iter() {
-        for (i, column) in columns.iter().enumerate() {
-            let is_match = {
-                column.iter().all(|&val| {
-                    ranges
-                        .iter()
-                        .any(|&(start, end)| val >= start && val <= end)
-                })
-            };
-
-            if is_match {
-                match field_indicies.get_mut(field_name) {
-                    Some(list) => list.push(i),
-                    None => {
-                        field_indicies.insert(field_name.clone(), vec![i]);
-                    }
-                };
-            }
-        }
-    }
-
-    let mut field_indicies: Vec<(String, Vec<usize>)> = field_indicies.into_iter().collect();
-    field_indicies
-        .sort_by(|(_, indicies_a), (_, indicies_b)| indicies_b.len().cmp(&indicies_a.len()));
-
-    let mut field_indicies: Vec<(String, HashSet<usize>)> = field_indicies
+    let mut field_possible_indicies: Vec<(String, HashSet<usize>)> = input
+        .field_rules
         .iter()
-        .map(|(field_name, indicies)| (field_name.clone(), indicies.iter().cloned().collect()))
+        .map(|(field_name, ranges)| {
+            let possible_indicies = field_columns
+                .iter()
+                .enumerate()
+                .filter(|(_, column)| {
+                    column.iter().all(|&val| {
+                        ranges
+                            .iter()
+                            .any(|&(start, end)| val >= start && val <= end)
+                    })
+                })
+                .map(|(i, _)| i)
+                .collect();
+
+            (field_name.clone(), possible_indicies)
+        })
         .collect();
 
-    for i in 1..field_indicies.len() {
-        let prev_indicies = &field_indicies[i - 1];
-        let curr_indicies = &field_indicies[i];
+    field_possible_indicies
+        .sort_by(|(_, indicies_a), (_, indicies_b)| indicies_b.len().cmp(&indicies_a.len()));
 
-        let difference: HashSet<usize> = prev_indicies
-            .1
-            .difference(&curr_indicies.1)
-            .cloned()
-            .collect();
+    for i in 1..field_possible_indicies.len() {
+        let prev_indicies = &field_possible_indicies[i - 1].1;
+        let curr_indicies = &field_possible_indicies[i].1;
 
-        *field_indicies.get_mut(i - 1).unwrap() = (prev_indicies.0.clone(), difference);
+        let difference: HashSet<usize> =
+            prev_indicies.difference(&curr_indicies).cloned().collect();
+
+        (*field_possible_indicies.get_mut(i - 1).unwrap()).1 = difference;
     }
 
-    let field_indicies: HashMap<String, usize> = field_indicies
+    let field_indicies: HashMap<String, usize> = field_possible_indicies
         .iter()
         .map(|(field_name, indicies)| (field_name.clone(), *indicies.iter().next().unwrap()))
         .collect();
@@ -179,6 +163,6 @@ pub fn part_two() -> usize {
     departure_fields
         .iter()
         .map(|&field_name| field_indicies.get(field_name).unwrap())
-        .map(|&ticket_index| input.ticket[ticket_index])
+        .map(|&field_index| input.my_ticket[field_index])
         .fold(1, |acc, curr| acc * curr)
 }
