@@ -16,6 +16,7 @@ mod day13;
 mod day14;
 mod day15;
 mod day16;
+mod day17;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -85,6 +86,10 @@ fn main() {
         16 => {
             println!("Day16 p1: {:?}", day16::part_one());
             println!("Day16 p2: {:?}", day16::part_two());
+        }
+        17 => {
+            println!("Day17 p1: {:?}", day17::part_one());
+            println!("Day17 p2: {:?}", day17::part_two());
         }
         _ => println!("Not a valid date."),
     }
