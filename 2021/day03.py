@@ -41,10 +41,9 @@ def find_oxygen():
     oxygen = input[valids.pop()]
     ox_val = 0
 
-    for i in range(len(oxygen)):
-        ai = len(oxygen) - i - 1
-        ox_ai = 1 if oxygen[ai] == '1' else 0
-        ox_val += (2 ** i) * ox_ai
+    for (i, val) in enumerate(reversed(oxygen)):
+        val = 1 if val == '1' else 0
+        ox_val += (2**i) * val
 
     return ox_val
 
@@ -83,15 +82,14 @@ def find_co2():
 
         valids = new_valids
 
-    oxygen = input[valids.pop()]
-    ox_val = 0
+    binary = input[valids.pop()]
+    decimal = 0
 
-    for i in range(len(oxygen)):
-        ai = len(oxygen) - i - 1
-        ox_ai = 1 if oxygen[ai] == '1' else 0
-        ox_val += (2 ** i) * ox_ai
+    for (i, val) in enumerate(reversed(binary)):
+        val = 1 if val == '1' else 0
+        decimal += (2**i) * val
 
-    return ox_val
+    return decimal
 
 
 ox_val = find_oxygen()
