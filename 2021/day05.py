@@ -61,10 +61,4 @@ for i in range(1000):
         if grid[i][j] > 1:
             overlap_count += 1
 
-# for j in range(1000):
-#     line = ""
-#     for i in range(1000):
-#         line += str(grid[i][j])
-#     print(line)
-
 print(overlap_count)
