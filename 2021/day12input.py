@@ -1,0 +1,47 @@
+input = [
+    ('xx', 'xh'),
+    ('vx', 'qc'),
+    ('cu', 'wf'),
+    ('ny', 'LO'),
+    ('cu', 'DR'),
+    ('start', 'xx'),
+    ('LO', 'vx'),
+    ('cu', 'LO'),
+    ('xx', 'cu'),
+    ('cu', 'ny'),
+    ('xh', 'start'),
+    ('qc', 'DR'),
+    ('vx', 'AP'),
+    ('end', 'LO'),
+    ('ny', 'DR'),
+    ('vx', 'end'),
+    ('DR', 'xx'),
+    ('start', 'DR'),
+    ('end', 'ny'),
+    ('ny', 'xx'),
+    ('xh', 'DR'),
+    ('cu', 'xh'),
+]
+
+# input = [
+
+#     ('start', 'A'),
+#     ('start', 'b'),
+#     ('A', 'c'),
+#     ('A', 'b'),
+#     ('b', 'd'),
+#     ('A', 'end'),
+#     ('b', 'end'),
+
+# # ('dc', 'end'),
+# # ('HN', 'start'),
+# # ('start', 'kj'),
+# # ('dc', 'start'),
+# # ('dc', 'HN'),
+# # ('LN', 'dc'),
+# # ('HN', 'end'),
+# # ('kj', 'sa'),
+# # ('kj', 'HN'),
+# # ('kj', 'dc'),
+
+# ]
